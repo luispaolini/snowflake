@@ -1,5 +1,9 @@
 package com.example.snowflake.service;
 
+import com.example.snowflake.model.Customer;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
@@ -8,6 +12,32 @@ import java.util.Properties;
 
 @Service
 public class SnowflakeJDBCService {
+
+    public List<Customer> getCustomerProcJson() throws SQLException, JsonProcessingException {
+        Connection connection = getConnection();
+
+        PreparedStatement statement = (PreparedStatement)
+                connection.prepareStatement("CALL SP_GET_CUSTOMER_JSON(60001)");
+
+        ResultSet resultSet = statement.executeQuery();
+
+        if (resultSet.next()) {
+            System.out.println(resultSet.getString(1));
+            return convertToCustomer(resultSet.getString(1));
+        }
+        resultSet.close();
+        statement.close();
+        connection.close();
+
+        return List.of();
+    }
+
+    private List<Customer> convertToCustomer(String customerData) throws JsonProcessingException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        return objectMapper.readValue(customerData, new TypeReference<List<Customer>>() {});
+    }
 
     public String getCustomerProc() throws SQLException {
         Connection connection = getConnection();
