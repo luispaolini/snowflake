@@ -20,7 +20,7 @@ public class SnowflakeJDBCService {
                 connection.prepareStatement("CALL SP_GET_CUSTOMER_JSON(60001)");
 
         ResultSet resultSet = statement.executeQuery();
-
+        
         if (resultSet.next()) {
             System.out.println(resultSet.getString(1));
             return convertToCustomer(resultSet.getString(1));
